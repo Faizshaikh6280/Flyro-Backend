@@ -112,3 +112,61 @@ Example Response Body:
   "token": "dummyToken"
 }
 ```
+
+# Logout Endpoint
+
+This endpoint is used to logout a user.
+
+## HTTP Method
+
+- `POST`
+
+## Endpoint URL
+
+- `/api/v1/users/logout`
+
+## Request Body
+
+No request body is required for this endpoint.
+
+## Response Format
+
+The response will be in JSON format and will contain a success message.
+
+```json
+{
+  "message": "User logged out successfully"
+}
+```
+
+# Get User Profile Endpoint
+
+This endpoint is used to retrieve a user's profile information.
+
+## HTTP Method
+
+- `GET`
+
+## Endpoint URL
+
+- `/api/v1/users/profile`
+
+## Request Body
+
+No request body is required for this endpoint.
+
+## Response Format
+
+The response will be in JSON format and will contain the user's profile information.
+
+```json
+{
+  "user": {
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "johndoe@example.com"
+  }
+}
+```

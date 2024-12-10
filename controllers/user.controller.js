@@ -1,5 +1,6 @@
 const userModel = require('../models/user.model');
 const { validationResult } = require('express-validator');
+const blacklistTokenModel = require('../models/blacklist.model');
 
 module.exports.registerUser = async (req, res) => {
   try {
@@ -29,11 +30,20 @@ module.exports.registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    console.log(user);
-
     const token = user.getAuthToken();
 
-    delete user.password;
+    const cookieOptions = {
+      httpOnly: true,
+      expires: new Date(
+        Date.now() + process.env.JWT_EXPIRE_IN * 24 * 60 * 60 * 1000
+      ), // valid for 24 hours from now if expire in is 1 day
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+    }
+
+    res.cookie('token', token, cookieOptions);
 
     res.status(200).json({ user, token });
   } catch (error) {
@@ -56,15 +66,48 @@ module.exports.loginUser = async (req, res) => {
 
     const isValid = await user.compareMethod(password);
 
-    console.log(isValid);
-
     if (!isValid)
       return res.status(401).json({ error: 'Email or password is incorrect.' });
 
     const token = user.getAuthToken();
 
+    const cookieOptions = {
+      httpOnly: true,
+      expires: new Date(
+        Date.now() + process.env.JWT_EXPIRE_IN * 24 * 60 * 60 * 1000
+      ), // valid for 24 hours from now if expire_in is 1 day
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+      cookieOptions.secure = true;
+    }
+
+    res.cookie('token', token, cookieOptions);
+
     res.status(200).json({ user, token });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+module.exports.getUserProfile = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+module.exports.logout = async (req, res, next) => {
+  try {
+    res.clearCookie('token');
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    await blacklistTokenModel.create({ token });
+
+    res.status(200).json({ message: 'User Logout Successfully!' });
+  } catch (error) {
+    res.status(400).json({ error });
   }
 };

@@ -9,8 +9,10 @@ const userRouter = require('./routes/user.route');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 app.use(cors());
+app.use(cookieParser());
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
