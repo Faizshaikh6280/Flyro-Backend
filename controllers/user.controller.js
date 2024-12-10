@@ -29,10 +29,42 @@ module.exports.registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
+    console.log(user);
+
     const token = user.getAuthToken();
+
+    delete user.password;
 
     res.status(200).json({ user, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports.loginUser = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty())
+      return res.status(400).json({ error: errors.array() });
+
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email }).select('+password');
+
+    if (!user)
+      return res.status(401).json({ error: 'Email or password is incorrect.' });
+
+    const isValid = await user.compareMethod(password);
+
+    console.log(isValid);
+
+    if (!isValid)
+      return res.status(401).json({ error: 'Email or password is incorrect.' });
+
+    const token = user.getAuthToken();
+
+    res.status(200).json({ user, token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };
