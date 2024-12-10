@@ -81,11 +81,13 @@ The request body should contain the following fields:
 
 ## Example Request Body
 
-````json
+```json
 {
   "email": "johndoe@example.com",
   "password": "password123"
 }
+```
+
 ### Response Body
 
 The response body should contain the following fields:
@@ -109,4 +111,4 @@ Example Response Body:
   },
   "token": "dummyToken"
 }
-````
+```
