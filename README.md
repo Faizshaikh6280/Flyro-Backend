@@ -1,4 +1,4 @@
-# Flyro-Backend
+# Flyro-Backend - API
 
 ## User Registration Endpoint
 
