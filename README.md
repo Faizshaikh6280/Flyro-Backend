@@ -170,3 +170,144 @@ The response will be in JSON format and will contain the user's profile informat
   }
 }
 ```
+
+# Captain Registration API Documentation
+
+## Overview
+
+This API endpoint allows for the registration of a new captain. It validates input data, ensures unique email addresses, hashes passwords, and generates an authentication token. The token is stored in a secure cookie upon successful registration.
+
+---
+
+## HTTP Method
+
+- `POST`
+
+## Endpoint URL
+
+- `/api/v1/captain`
+
+---
+
+## Request Format
+
+### **Headers**
+
+| Header Name    | Type   | Description                 |
+| -------------- | ------ | --------------------------- |
+| `Content-Type` | String | Must be `application/json`. |
+
+### **Body**
+
+The request body should be a JSON object with the following structure:
+
+- **`fullname`**: An object with the following properties:
+  - **`firstname`**: A string with a minimum length of 3 characters.
+  - **`lastname`**: A string with a minimum length of 3 characters.
+- **`email`**: A string that must be a valid email address.
+- **`password`**: A string with a minimum length of 6 characters.
+- **`vehicle`**: An object describing the captain's vehicle with the following properties:
+  - **`color`**: A string representing the vehicle's color.
+  - **`type`**: A string that can be one of `car`, `auto`, or `motorcycle`.
+  - **`capacity`**: A number representing the seating capacity of the vehicle.
+
+#### Example Request Body
+
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "johndoe@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "color": "Red",
+    "type": "car",
+    "capacity": 4
+  }
+}
+```
+
+---
+
+## Response Format
+
+### **Success Response**
+
+If the captain is successfully registered, the server will return a JSON object containing the captain's details (excluding the password) and an authentication token.
+
+#### **Status Code**: `200 OK`
+
+#### Example Response Body:
+
+```json
+{
+  "user": {
+    "_id": "62c27c9f4f1a4b23456789ab",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "johndoe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "type": "car",
+      "capacity": 4
+    }
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+### **Error Responses**
+
+#### **1. Input Validation Errors**
+
+If the input validation fails, the server will respond with a 400 error and details about the invalid fields.
+
+- **Status Code**: `400 Bad Request`
+
+- **Example Response**:
+
+```json
+{
+  "error": [
+    {
+      "msg": "Email is invalid",
+      "param": "email",
+      "location": "body"
+    }
+  ]
+}
+```
+
+#### **2. Email Already Exists**
+
+If the provided email is already associated with another captain, the server will return an error indicating the conflict.
+
+- **Status Code**: `400 Bad Request`
+
+- **Example Response**:
+
+```json
+{
+  "error": "Captain already exists with this email."
+}
+```
+
+#### **3. Server Errors**
+
+If an unexpected error occurs during processing, the server will return a generic error message.
+
+- **Status Code**: `400 Bad Request`
+
+- **Example Response**:
+
+```json
+{
+  "error": "An unexpected error occurred."
+}
+```
