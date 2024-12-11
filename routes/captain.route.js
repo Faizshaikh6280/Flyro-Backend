@@ -1,6 +1,6 @@
 const express = require('express');
 const captainController = require('../controllers/captain.controller');
-const authController = require('../middlewares/auth.middleware');
+const authCaptainController = require('../middlewares/authCaptain.middleware');
 const { body } = require('express-validator');
 
 const router = express.Router();
@@ -37,15 +37,24 @@ router.post(
   captainController.registerCaptain
 );
 
-// router.post(
-//   '/login',
-//   [
-//     body('email').isEmail().withMessage('Email is not valid.'),
-//     body('password').isLength({ min: 6 }).withMessage('Password is too short.'),
-//   ],
-//   userController.loginUser
-// );
-// router.get('/profile', authController.authUser, userController.getUserProfile);
-// router.get('/logout', authController.authUser, userController.logout);
+router.post(
+  '/login',
+  [
+    body('email').isEmail().withMessage('Email is not valid.'),
+    body('password').isLength({ min: 6 }).withMessage('Password is too short.'),
+  ],
+  captainController.loginCaptain
+);
+
+router.get(
+  '/profile',
+  authCaptainController.authCaptain,
+  captainController.getCaptainProfile
+);
+router.get(
+  '/logout',
+  authCaptainController.authCaptain,
+  captainController.logout
+);
 
 module.exports = router;
